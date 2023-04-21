@@ -19,26 +19,23 @@ function main() {
     echo '** Based off the guide available at https://ubuntu.com/tutorials/install-and-configure-wordpress#1-overview'
     
     echo '** Updating system'
-    apt-get -y update
-    apt-get -y upgrade
+    #apt-get -y update
+    #apt-get -y upgrade
     
     echo '** Installing dependencies'
-    apt-get install apache2 \
-                 ghostscript \
-                 libapache2-mod-php \
-                 mysql-server \
-                 php \
-                 php-bcmath \
-                 php-curl \
-                 php-imagick \
-                 php-intl \
-                 php-json \
-                 php-mbstring \
-                 php-mysql \
-                 php-xml \
-                 php-zip
+    #apt-get -y install apache2 ghostscript libapache2-mod-php mysql-server php php-bcmath php-curl php-imagick php-intl php-json php-mbstring php-mysql php-xml php-zip
     
-    while [[ false ]];
+    echo '** Downloading/deploying WP'
+    mkdir -p /var/www
+    chown www-data /var/www
+    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
+    
+    
+    
+    
+    
+    
+    while [[ true ]];
     do
       clear
       echo '1. Update/Upgrade'
