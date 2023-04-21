@@ -14,8 +14,8 @@ Setup a Ubuntu 22.04 server instance with a blank wordpress site
 
 ## Install Wordpress & dependencies
 - Use the wp.sh script contained in this repo.
-  - `git clone https://github.com/tlafrank/wp`
-  - `chmod 764 wp.sh`
+  - `git clone git@github.com:tlafrank/wp.git`
+  - `chmod 764 wp.sh` (may no longer be required)
   - `sudo ./wp.sh`
 - The script was constructed following advice from https://ubuntu.com/tutorials/install-and-configure-wordpress#1-overview
 
