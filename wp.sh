@@ -31,23 +31,32 @@ function main() {
 #    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
     
     echo 'Configuring Apache'
-    touch /etc/apache2/sites-available/wordpress.conf
-    cat > /etc/apache2/sites-available/wordpress.conf << EOF
-    <VirtualHost *:80>
-      DocumentRoot /var/www/wordpress
-      <Directory /var/www/wordpress>
-          Options FollowSymLinks
-          AllowOverride Limit Options FileInfo
-          DirectoryIndex index.php
-          Require all granted
-      </Directory>
-      <Directory /var/www/wordpress/wp-content>
-          Options FollowSymLinks
-          Require all granted
-      </Directory>
-    </VirtualHost>
-EOF
-    
+#    touch /etc/apache2/sites-available/wordpress.conf
+#    cat > /etc/apache2/sites-available/wordpress.conf << EOF
+#    <VirtualHost *:80>
+#      DocumentRoot /var/www/wordpress
+#      <Directory /var/www/wordpress>
+#          Options FollowSymLinks
+#          AllowOverride Limit Options FileInfo
+#          DirectoryIndex index.php
+#          Require all granted
+#      </Directory>
+#      <Directory /var/www/wordpress/wp-content>
+#          Options FollowSymLinks
+#          Require all granted
+#      </Directory>
+#    </VirtualHost>
+#EOF
+    echo 'Configure MySQL'
+    mysql -u root -e "DROP SCHEMA IF EXISTS wordpress;"
+    mysql -u root -e "CREATE DATABASE wordpress;"
+    mysql -u root -e "DROP USER IF EXISTS wordpress@localhost"
+    mysql -u root -e "CREATE USER wordpress@localhost IDENTIFIED BY '<your-password>'"
+    mysql -u root -e "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER ON wordpress.* TO wordpress@localhost;"
+    mysql -u root -e "FLUSH PRIVILEGES;"
+    service mysql restart
+ 
+ 
     a2ensite wordpress
     a2enmod rewrite
     a2dissite 000-default
