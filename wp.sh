@@ -17,51 +17,101 @@ function main() {
     
     echo '** Commencing setup for WordPress'
     echo '** Based off the guide available at https://ubuntu.com/tutorials/install-and-configure-wordpress#1-overview'
-    
+   
+    while [[ true ]];
+    do
+      #clear
+      echo '1. Update/Upgrade'
+      echo '2. Install Dependencies'
+      echo '3. Download/Deploy Wordpress'
+      echo '4. Configure Apache' 
+      echo '5. Configure MySQL'
+      echo '6. Configure Wordpress'
+      echo 'Q. Exit'
+
+      read -p "Selection: " choice
+
+      case $choice in
+        '1') update;;
+        '2') install_dependencies;;
+        '3') deployWP;;
+        '4') configureApache;;
+        '5') configureMysql;;
+        '6') configureWordpress;;
+        
+        'Q') break;;
+        'q') break;;
+        *) echo "Invalid Selection";;
+      esac
+      read -n 1 -p "Press any key to continue..."
+    done
+  else
+    echo 'Script is not running as SUDO (required). Exiting with no changes.'
+  fi
+}
+
+#Update packages
+#Checked 21 Apr 23
+function update() {
     echo '** Updating system'
-#    apt-get -y update
-#    apt-get -y upgrade
-    
+    apt-get -y update
+    apt-get -y upgrade
+}
+
+#Install dependencies
+#Checked 21 Apr 23
+function install_dependencies() {
     echo '** Installing dependencies'
-#    apt-get -y install apache2 ghostscript libapache2-mod-php mysql-server php php-bcmath php-curl php-imagick php-intl php-json php-mbstring php-mysql php-xml php-zip
-    
-    echo '** Downloading/deploying WP'
-#    mkdir -p /var/www
-#    chown www-data /var/www
-#    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
-    
-    echo 'Configuring Apache'
-#    touch /etc/apache2/sites-available/wordpress.conf
-#    cat > /etc/apache2/sites-available/wordpress.conf << EOF
-#    <VirtualHost *:80>
-#      DocumentRoot /var/www/wordpress
-#      <Directory /var/www/wordpress>
-#          Options FollowSymLinks
-#          AllowOverride Limit Options FileInfo
-#          DirectoryIndex index.php
-#          Require all granted
-#      </Directory>
-#      <Directory /var/www/wordpress/wp-content>
-#          Options FollowSymLinks
-#          Require all granted
-#      </Directory>
-#    </VirtualHost>
-#EOF
+    apt-get -y install apache2 ghostscript libapache2-mod-php mysql-server php php-bcmath php-curl php-imagick php-intl php-json php-mbstring php-mysql php-xml php-zip
+}
 
-#    a2ensite wordpress
-#    a2enmod rewrite
-#    a2dissite 000-default
-#    service apache2 reload
+function deployWP {
+    echo '** Downloading/deploying WP to /var/www'
+    mkdir -p /var/www
+    chown www-data /var/www
+    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
+}
 
-    echo 'Configure MySQL'
-#    mysql -u root -e "DROP SCHEMA IF EXISTS wordpress;"
-#    mysql -u root -e "CREATE DATABASE wordpress;"
+function configureApache {
+    echo '** Configuring Apache'
+    touch /etc/apache2/sites-available/wordpress.conf
+    cat > /etc/apache2/sites-available/wordpress.conf << EOF
+    <VirtualHost *:80>
+      DocumentRoot /var/www/wordpress
+      <Directory /var/www/wordpress>
+          Options FollowSymLinks
+          AllowOverride Limit Options FileInfo
+          DirectoryIndex index.php
+          Require all granted
+      </Directory>
+      <Directory /var/www/wordpress/wp-content>
+          Options FollowSymLinks
+          Require all granted
+      </Directory>
+    </VirtualHost>
+EOF
+
+    a2ensite wordpress
+    a2enmod rewrite
+    a2dissite 000-default
+    service apache2 reload
+}
+
+
+
+function configureMysql {
+    echo '** Configure MySQL'
+    mysql -u root -e "DROP SCHEMA IF EXISTS wordpress;"
+    mysql -u root -e "CREATE DATABASE wordpress;"
     mysql -u root -e "DROP USER IF EXISTS wordpress@localhost"
     mysql -u root -e "CREATE USER wordpress@localhost IDENTIFIED BY '342gd45gtehtr'"
     mysql -u root -e "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER ON wordpress.* TO wordpress@localhost;"
     mysql -u root -e "FLUSH PRIVILEGES;"
     service mysql restart
- 
+}
+
+function configureWordpress {
+    echo '** Configure Wordpress'
     sudo -u www-data cp /var/www/wordpress/wp-config-sample.php /var/www/wordpress/wp-config.php
     sudo -u www-data sed -i 's/database_name_here/wordpress/' /var/www/wordpress/wp-config.php
     sudo -u www-data sed -i 's/username_here/wordpress/' /var/www/wordpress/wp-config.php
@@ -77,99 +127,8 @@ function main() {
     sudo -u www-data sed -i "/define( 'NONCE_SALT'/d" /var/www/wordpress/wp-config.php
 
     curl https://api.wordpress.org/secret-key/1.1/salt/ | sudo tee -a /var/www/wordpress/wp-config.php
-    
-    
-    while [[ true ]];
-    do
-      #clear
-      echo '1. Update/Upgrade'
-      echo '2. Install Git'
-      echo '3. Install Docker'
-      echo '4. Remove SUDO Password Requirement (TBA)' 
-      echo '5. Setup networking'
-      echo 'Q. Exit'
-
-      read -p "Selection: " choice
-
-      case $choice in
-        '1') update;;
-        '2') install_git;;
-        '3') install_docker;;
-        '4') removeSudoPassword;;
-        '5') setup_network;;
-        'Q') break;;
-        'q') break;;
-        *) echo "Invalid Selection";;
-      esac
-      read -n 1 -p "Press any key to continue..."
-    done
-  else
-    echo 'Script is not running as SUDO (required). Exiting with no changes.'
-  fi
 }
 
 
-
-
-
-
-
-#Install and conduct basic configuration of git
-#Checked 6 Apr 19
-function install_git() {
-  apt-get -y install git
-
-  read -p "Email to use for git registration: " email
-  git config --global user.email $email
-
-  read -p "Name to use for git registration: " name
-  git config --global user.name $name
-}
-
-function install_docker {
-  #Prefer this one
-  add-apt-repository universe
-  apt install -y docker.io
-  
-  #Add current user to docker group
-  read -n 1 -p "Add the current user $USER to the docker group? (y/n)?" continue
-  if [[ $continue =~ [yY] ]]; then
-    echo "adding user"
-    usermod -aG docker $USER
-  fi
-}
-
-function install_docker2 {
-  #Installs docker
-  apt-get -y install apt-transport-https ca-certificates gnupg-agent software-properties-common
-  
-  #Add the GPG key
-  wget -qO - https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-  add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-  
-  apt-get -y update
-  
-  apt-get install docker-ce docker-ce-cli containerd.io
-
-  #Add current user to docker group
-  read -n 1 -p "Add the current user $USER to the docker group? (y/n)?" continue
-  if [[ $continue =~ [yY] ]]; then
-    echo "adding user"
-    usermod -aG docker $USER
-  fi
-
-}
-
-function removeSudoPassword {
-  echo 'made it here'
-  #sudo visudo
-  
-  #At the bottom, add:
-  #$USER ALL=(ALL) NOPASSWD:ALL
-}
-
-function setup_network() {
-  $DIR/helpers/network.sh
-}
 
 main "$@"
