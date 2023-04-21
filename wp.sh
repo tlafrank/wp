@@ -64,13 +64,12 @@ function main() {
     
     while [[ true ]];
     do
-      clear
+      #clear
       echo '1. Update/Upgrade'
       echo '2. Install Git'
       echo '3. Install Docker'
       echo '4. Remove SUDO Password Requirement (TBA)' 
       echo '5. Setup networking'
-      echo '6. Setup database, node'
       echo 'Q. Exit'
 
       read -p "Selection: " choice
@@ -81,7 +80,6 @@ function main() {
         '3') install_docker;;
         '4') removeSudoPassword;;
         '5') setup_network;;
-        '6') setup_database;;
         'Q') break;;
         'q') break;;
         *) echo "Invalid Selection";;
@@ -94,11 +92,7 @@ function main() {
 }
 
 
-#
-#
-function setup_database {
-  echo "Use the appropriate script located in the helper folder"
-}
+
 
 
 
