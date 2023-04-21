@@ -47,20 +47,25 @@ function main() {
 #      </Directory>
 #    </VirtualHost>
 #EOF
+
+#    a2ensite wordpress
+#    a2enmod rewrite
+#    a2dissite 000-default
+#    service apache2 reload
+
     echo 'Configure MySQL'
-    mysql -u root -e "DROP SCHEMA IF EXISTS wordpress;"
-    mysql -u root -e "CREATE DATABASE wordpress;"
+#    mysql -u root -e "DROP SCHEMA IF EXISTS wordpress;"
+#    mysql -u root -e "CREATE DATABASE wordpress;"
     mysql -u root -e "DROP USER IF EXISTS wordpress@localhost"
-    mysql -u root -e "CREATE USER wordpress@localhost IDENTIFIED BY '<your-password>'"
+    mysql -u root -e "CREATE USER wordpress@localhost IDENTIFIED BY '342gd45gtehtr'"
     mysql -u root -e "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER ON wordpress.* TO wordpress@localhost;"
     mysql -u root -e "FLUSH PRIVILEGES;"
     service mysql restart
  
- 
-    a2ensite wordpress
-    a2enmod rewrite
-    a2dissite 000-default
-    service apache2 reload
+    sudo -u www-data cp /var/www/wordpress/wp-config-sample.php /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i 's/database_name_here/wordpress/' /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i 's/username_here/wordpress/' /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i 's/password_here/342gd45gtehtr/' /var/www/wordpress/wp-config.php
     
     while [[ true ]];
     do
