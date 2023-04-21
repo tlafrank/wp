@@ -32,7 +32,7 @@ function main() {
     
     echo 'Configuring Apache'
     touch /etc/apache2/sites-available/wordpress.conf
-    cat << EOF >> /etc/apache2/sites-available/wordpress.conf
+    cat > /etc/apache2/sites-available/wordpress.conf << EOF
     <VirtualHost *:80>
       DocumentRoot /var/www/wordpress
       <Directory /var/www/wordpress>
