@@ -67,6 +67,17 @@ function main() {
     sudo -u www-data sed -i 's/username_here/wordpress/' /var/www/wordpress/wp-config.php
     sudo -u www-data sed -i 's/password_here/342gd45gtehtr/' /var/www/wordpress/wp-config.php
     
+    sudo -u www-data sed -i "/define( 'AUTH_KEY'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'SECURE_AUTH_KEY'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'LOGGED_IN_KEY'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'NONCE_KEY'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'SECURE_AUTH_SALT'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'LOGGED_IN_SALT'/d" /var/www/wordpress/wp-config.php
+    sudo -u www-data sed -i "/define( 'NONCE_SALT'/d" w/var/www/wordpress/wp-config.php
+
+    curl https://api.wordpress.org/secret-key/1.1/salt/ | sudo tee -a /var/www/wordpress/wp-config.php
+    
+    
     while [[ true ]];
     do
       #clear
