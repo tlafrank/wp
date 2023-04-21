@@ -46,7 +46,7 @@ function main() {
           Require all granted
       </Directory>
     </VirtualHost>
-    EOF
+EOF
     
     a2ensite wordpress
     a2enmod rewrite
