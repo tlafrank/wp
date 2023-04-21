@@ -19,21 +19,39 @@ function main() {
     echo '** Based off the guide available at https://ubuntu.com/tutorials/install-and-configure-wordpress#1-overview'
     
     echo '** Updating system'
-    #apt-get -y update
-    #apt-get -y upgrade
+#    apt-get -y update
+#    apt-get -y upgrade
     
     echo '** Installing dependencies'
-    #apt-get -y install apache2 ghostscript libapache2-mod-php mysql-server php php-bcmath php-curl php-imagick php-intl php-json php-mbstring php-mysql php-xml php-zip
+#    apt-get -y install apache2 ghostscript libapache2-mod-php mysql-server php php-bcmath php-curl php-imagick php-intl php-json php-mbstring php-mysql php-xml php-zip
     
     echo '** Downloading/deploying WP'
-    mkdir -p /var/www
-    chown www-data /var/www
-    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
+#    mkdir -p /var/www
+#    chown www-data /var/www
+#    curl https://wordpress.org/latest.tar.gz | sudo -u www-data tar zx -C /var/www
     
+    echo 'Configuring Apache'
+    touch /etc/apache2/sites-available/wordpress.conf
+    cat << EOF >> /etc/apache2/sites-available/wordpress.conf
+    <VirtualHost *:80>
+      DocumentRoot /var/www/wordpress
+      <Directory /var/www/wordpress>
+          Options FollowSymLinks
+          AllowOverride Limit Options FileInfo
+          DirectoryIndex index.php
+          Require all granted
+      </Directory>
+      <Directory /var/www/wordpress/wp-content>
+          Options FollowSymLinks
+          Require all granted
+      </Directory>
+    </VirtualHost>
+    EOF
     
-    
-    
-    
+    a2ensite wordpress
+    a2enmod rewrite
+    a2dissite 000-default
+    service apache2 reload
     
     while [[ true ]];
     do
